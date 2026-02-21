@@ -5,9 +5,11 @@ import crypto from "crypto";
 import multer from "multer";
 import { Product, ProductDetail, PaymentResponse } from "../../shared/api.js";
 
-const PRODUCTS_FILE = path.join(process.cwd(), "products.json");
-const UPLOADS_DIR = path.join(process.cwd(), "uploads");
-const PRIVATE_PRODUCTS_DIR = path.join(process.cwd(), "private-products");
+const __dirname = import.meta.dirname;
+const isServerless = process.env.VERCEL || process.env.NETLIFY;
+const PRODUCTS_FILE = path.resolve(process.cwd(), "products.json");
+const UPLOADS_DIR = isServerless ? "/tmp" : path.resolve(process.cwd(), "uploads");
+const PRIVATE_PRODUCTS_DIR = path.resolve(process.cwd(), "private-products");
 
 // In-memory token store (Token -> { productId, expiry })
 const downloadTokens = new Map<string, { productId: string; expiry: number }>();
@@ -38,7 +40,14 @@ const upload = multer({
 
 export const getProducts = async (): Promise<any[]> => {
   try {
-    const data = await fs.readFile(PRODUCTS_FILE, "utf-8");
+    let data;
+    try {
+      data = await fs.readFile(PRODUCTS_FILE, "utf-8");
+    } catch (e) {
+      // Fallback for different serverless layouts
+      const fallbackPath = path.resolve(__dirname, "../../products.json");
+      data = await fs.readFile(fallbackPath, "utf-8");
+    }
     return JSON.parse(data);
   } catch (error) {
     console.error("Error reading products file:", error);
