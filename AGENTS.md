@@ -154,6 +154,42 @@ const data: MyRouteResponse = await response.json();
 - **Binary**: Self-contained executables (Linux, macOS, Windows)
 - **Cloud Deployment**: Use either Netlify or Vercel via their MCP integrations for easy deployment. Both providers work well with this starter template.
 
+## Digital Product Store - Deployment & Security
+
+### Security Features
+- **No direct access**: Private products are stored outside the public directory.
+- **Token-based downloads**: Each purchase generates a unique 32-character hex token.
+- **Expiry**: Tokens expire automatically after 10 minutes.
+- **File Validation**: Only images under 2MB are accepted for payment proof.
+- **Sanitization**: Filenames are sanitized and randomized to prevent injection.
+
+### Adding New Products
+1. Upload your file to `private-products/[id]/filename`.
+2. Update `server/data/products.json` with the new product info and `filePath`.
+3. Add a QR code image to `public/qrcodes/[id].png`.
+
+### Deployment Guide
+
+#### Option 1: Vercel / Netlify
+1. Connect your repository to Vercel/Netlify.
+2. Set Environment Variables:
+   - `FAMPAY_ID`: Your Fampay ID (e.g., `user@fam`).
+   - `FAMPAY_SECRET`: A secret key for verification.
+3. Build Command: `pnpm build`
+4. Output Directory: `dist/spa` (Note: Ensure the server function is correctly configured for the cloud provider).
+
+#### Option 2: Railway / Heroku
+1. Create a new service and connect your repository.
+2. Set Environment Variables as above.
+3. Start Command: `pnpm start`
+4. **Persistent Storage Warning**: Both Railway and Heroku use ephemeral file systems. Uploaded screenshots and `private-products` will be lost on restart. For production, use AWS S3 or similar for file storage.
+
+### Manual Setup
+1. `pnpm install`
+2. `pnpm build`
+3. Create `.env` file with `FAMPAY_ID` and `FAMPAY_SECRET`.
+4. `pnpm start`
+
 ## Architecture Notes
 
 - Single-port development with Vite + Express integration

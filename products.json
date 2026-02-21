@@ -1,0 +1,16 @@
+[
+  {
+    "id": "post1",
+    "title": "Instagram Growth Guide",
+    "price": 49,
+    "filePath": "private-products/post1/guide.pdf",
+    "qrImage": "/qrcodes/post1.png"
+  },
+  {
+    "id": "post2",
+    "title": "Premium Photo Pack",
+    "price": 99,
+    "filePath": "private-products/post2/photos.zip",
+    "qrImage": "/qrcodes/post2.png"
+  }
+]

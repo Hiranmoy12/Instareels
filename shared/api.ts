@@ -4,9 +4,30 @@
  * and/or small pure JS functions that can be used on both client and server
  */
 
-/**
- * Example response type for /api/demo
- */
-export interface DemoResponse {
+export interface Product {
+  id: string;
+  title: string;
+  price: number;
+  qrImage: string;
+}
+
+export interface ProductDetail extends Product {
+  fampayId: string;
+}
+
+export interface PaymentSubmission {
+  productId: string;
+  name: string;
+  transactionId: string;
+}
+
+export interface PaymentResponse {
+  success: boolean;
   message: string;
+  downloadToken?: string;
+}
+
+export interface DownloadResponse {
+  error?: string;
+  url?: string;
 }
