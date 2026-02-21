@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { handleGetProduct, handleSubmitPayment, handleDownload, getProducts } from "./routes/products";
+import { handleGetProduct, handleSubmitPayment, handleDownload, getProducts } from "./routes/products.js";
 
 export function createServer() {
   const app = express();
@@ -12,12 +12,16 @@ export function createServer() {
   app.use(express.urlencoded({ extended: true }));
 
   // API routes
-  app.get("/api/products", async (_req, res) => {
+  app.get("/api/health", (_req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  app.get(["/api/products", "/api/product"], async (_req, res) => {
     const products = await getProducts();
     res.json(products);
   });
 
-  app.get("/api/products/:id", handleGetProduct);
+  app.get(["/api/products/:id", "/api/product/:id"], handleGetProduct);
 
   app.post("/api/submit-payment", handleSubmitPayment);
 

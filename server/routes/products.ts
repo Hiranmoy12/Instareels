@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import multer from "multer";
-import { Product, ProductDetail, PaymentResponse } from "@shared/api";
+import { Product, ProductDetail, PaymentResponse } from "../../shared/api.js";
 
 const PRODUCTS_FILE = path.join(process.cwd(), "products.json");
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
