@@ -68,7 +68,7 @@ export const handleGetProduct: RequestHandler = async (req, res) => {
   res.json(productDetail);
 };
 
-export const handleSubmitPayment: RequestHandler = (req, res) => {
+export const handleSubmitPayment: RequestHandler = (req: any, res) => {
   // Use multer as a manual middleware for this route if needed
   upload.single("screenshot")(req, res, (err) => {
     if (err) {
