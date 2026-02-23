@@ -83,7 +83,7 @@ export const handleGetProduct: RequestHandler = async (req, res) => {
     title: product.title,
     price: product.price,
     qrImage: product.qrImage,
-    fampayId: process.env.FAMPAY_ID || "yourname@fam",
+    fampayId: process.env.FAMPAY_ID || "8967888613@fam",
   };
 
   res.json(productDetail);
