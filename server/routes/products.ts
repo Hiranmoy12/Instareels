@@ -39,20 +39,32 @@ const upload = multer({
 });
 
 export const getProducts = async (): Promise<any[]> => {
-  try {
-    let data;
+  const possiblePaths = [
+    PRODUCTS_FILE,
+    path.resolve(process.cwd(), "products.json"),
+    path.resolve(__dirname, "../../products.json"),
+    path.resolve(__dirname, "../../../products.json"),
+    "/var/task/products.json",
+    path.join(process.cwd(), "api", "products.json"),
+  ];
+
+  console.log(`[getProducts] process.cwd(): ${process.cwd()}`);
+  console.log(`[getProducts] __dirname: ${__dirname}`);
+
+  for (const p of possiblePaths) {
     try {
-      data = await fs.readFile(PRODUCTS_FILE, "utf-8");
+      await fs.access(p);
+      const data = await fs.readFile(p, "utf-8");
+      const products = JSON.parse(data);
+      console.log(`[getProducts] Successfully loaded products from: ${p}`);
+      return products;
     } catch (e) {
-      // Fallback for different serverless layouts
-      const fallbackPath = path.resolve(__dirname, "../../products.json");
-      data = await fs.readFile(fallbackPath, "utf-8");
+      // Continue to next path
     }
-    return JSON.parse(data);
-  } catch (error) {
-    console.error("Error reading products file:", error);
-    return [];
   }
+
+  console.error("Could not find products.json in any of these locations:", possiblePaths);
+  return [];
 };
 
 export const handleGetProduct: RequestHandler = async (req, res) => {
@@ -132,15 +144,37 @@ export const handleDownload: RequestHandler = async (req, res) => {
     return;
   }
 
-  const filePath = path.join(process.cwd(), product.filePath);
-  
+  const possibleFilePaths = [
+    path.join(process.cwd(), product.filePath),
+    path.resolve(__dirname, "../../", product.filePath),
+    path.resolve(__dirname, "../../../", product.filePath),
+    path.join("/var/task", product.filePath),
+  ];
+
+  let filePath = null;
+  for (const p of possibleFilePaths) {
+    try {
+      await fs.access(p);
+      filePath = p;
+      console.log(`[handleDownload] Found file at: ${p}`);
+      break;
+    } catch (e) {
+      // Continue
+    }
+  }
+
+  if (!filePath) {
+    console.error("File not found in any of these locations:", possibleFilePaths);
+    res.status(500).json({ error: "Product file is missing or inaccessible" });
+    return;
+  }
+
   try {
-    await fs.access(filePath);
     res.download(filePath);
     // Optional: Delete token after download? For security, yes.
     downloadTokens.delete(token);
   } catch (error) {
-    console.error("File access error:", error);
-    res.status(500).json({ error: "Product file is missing or inaccessible" });
+    console.error("File download error:", error);
+    res.status(500).json({ error: "Error during file transmission" });
   }
 };

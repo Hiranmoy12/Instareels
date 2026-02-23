@@ -14,7 +14,7 @@
     }
   ],
   "functions": {
-    "api/**/*.ts": {
+    "api/index.ts": {
       "includeFiles": "products.json,private-products/**,shared/**,server/**"
     }
   },

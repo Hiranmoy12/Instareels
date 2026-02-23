@@ -12,9 +12,12 @@ export default function Index() {
 
   useEffect(() => {
     fetch("/api/products")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
-        setProducts(data);
+        setProducts(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch((err) => {
@@ -73,13 +76,13 @@ export default function Index() {
               <Card key={i} className="animate-pulse h-[350px] bg-white border-none shadow-sm"></Card>
             ))}
           </div>
-        ) : (
+        ) : products.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {products.map((product) => (
               <Card key={product.id} className="group overflow-hidden border-none shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white flex flex-col h-full">
                 <div className="aspect-[4/3] bg-slate-200 relative overflow-hidden">
-                  <img 
-                    src={`https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop`} 
+                  <img
+                    src={`https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop`}
                     alt={product.title}
                     className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                   />
@@ -119,6 +122,11 @@ export default function Index() {
                 </CardFooter>
               </Card>
             ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-white rounded-2xl shadow-sm max-w-2xl mx-auto">
+            <h2 className="text-2xl font-bold text-slate-900">No products found</h2>
+            <p className="text-slate-500 mt-2">Check back later for new digital content.</p>
           </div>
         )}
 

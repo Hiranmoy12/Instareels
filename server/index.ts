@@ -12,8 +12,33 @@ export function createServer() {
   app.use(express.urlencoded({ extended: true }));
 
   // API routes
-  app.get("/api/health", (_req, res) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  app.get("/api/health", async (_req, res) => {
+    const products = await getProducts();
+    res.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      productsCount: products.length,
+      env: process.env.NODE_ENV,
+      isVercel: !!process.env.VERCEL,
+      isNetlify: !!process.env.NETLIFY
+    });
+  });
+
+  app.get("/api/debug-files", async (_req, res) => {
+    try {
+      const fs = await import("fs/promises");
+      const path = await import("path");
+      const files = await fs.readdir(process.cwd());
+      const apiFiles = await fs.readdir(path.join(process.cwd(), "api")).catch(() => []);
+      res.json({
+        cwd: process.cwd(),
+        files,
+        apiFiles,
+        dirname: import.meta.dirname
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   });
 
   app.get(["/api/products", "/api/product"], async (_req, res) => {
